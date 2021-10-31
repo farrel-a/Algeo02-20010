@@ -67,14 +67,14 @@ def eigenFinderMxN(m):
     row = len(AAt)
     col = row
 
-    LambdaIminusA = [[[[0],0] for j in range(col)]for i in range(row)] #[[lambda^1,lambda^2,...], konstanta]
+    LambdaIminusA = [[[0,0] for j in range(col)]for i in range(row)] #[[lambda^0,lambda^1,lambda^2,...], konstanta]
     for i in range(row):
         for j in range(col):
             if (i==j):
-                LambdaIminusA[i][j][0][0] = 1
-                LambdaIminusA[i][j][1] = -AAt[i][j]
+                LambdaIminusA[i][j][1] = 1
+                LambdaIminusA[i][j][0] = -AAt[i][j]
             else:
-                LambdaIminusA[i][j][0][0] = 0
-                LambdaIminusA[i][j][1] = -AAt[i][j]
+                LambdaIminusA[i][j][1] = 0
+                LambdaIminusA[i][j][0] = -AAt[i][j]
     print(LambdaIminusA)
     #in progress
