@@ -130,4 +130,3 @@ def eigenFinderMxN(m):
     det = modifiedDetCof(LambdaIminusA)
     sol = solveEquation(det)
     return sorted(sol, reverse=True)
-    
