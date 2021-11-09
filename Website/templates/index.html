@@ -4,15 +4,21 @@
 </head>
 
 <body>
+<div align="center">
     <h1> TES WEBSITE </h1>
 `   <form method="post" action="/" enctype="multipart/form-data">
         <dl>
             <p>
-                <input type = "file", name="file" autocomplete="off" required>
+                <input type = "file" name="file" autocomplete="off" required>
             </p>
         </dl>
         <p>
             <input type="submit" value="Submit">
         </p>
     </form>
+    {% if filename %}
+        <img src= "https://www.planetware.com/wpimages/2020/02/france-in-pictures-beautiful-places-to-photograph-eiffel-tower.jpg">
+    {% endif %}
+</div>
+
 </body>
