@@ -24,7 +24,7 @@ def create_app():
         return render_template("index.html")
 
     @app.route("/", methods=["POST", "GET"])
-    def display_converted_image():
+    def save_image():
         if request.method == "POST":
             if 'file' not in request.files:
                 flash("No file detected")
@@ -43,6 +43,11 @@ def create_app():
             else:
                 flash("Allowed image type are: png,jpg, or jpeg")
                 return redirect(request.url)
+
+    @app.route('/display/<filename>')
+    def display_image(filename):
+        # print('display_image filename: ' + filename)
+        return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
     return app
