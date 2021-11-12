@@ -1,5 +1,6 @@
 # INI ISINYA OPERASI MATRIKS BIAR ENAK
 import numpy as np
+from sympy import *
 
 def multiply_matrix(m1,m2):
     col = len(m2[0])
@@ -134,7 +135,7 @@ def eigenFinderMxN(m):
 
 def findEigen(m):
     q, r = np.linalg.qr(m)
-    for i in range(1000):
+    for i in range(5000):
         q, r = np.linalg.qr(m)
         m2 = r @ q
 
@@ -142,9 +143,136 @@ def findEigen(m):
     row = len(r)
     eig = []
     for i in range(row):
-        eig.append(round(r[i][i]))
+        eig.append(r[i][i])
 
     eig = list(set(eig)) # drop duplicates
 
 
     return eig
+
+def findEigenVector(eig, m):
+    # eig : list of eigen
+    # m : matrix input
+    arrMat = []
+    for ld in eig:
+        mat = m
+        #lambdaI-A
+        for i in range(len(mat)):
+            for j in range(len(mat[0])):
+                if (i==j):
+                    mat[i][j] = (ld-(mat[i][j])) #lambda - elem
+                else:
+                    mat[i][j] = -mat[i][j]
+            mat[i].append(0)
+        arrMat.append(mat)
+    resVec = [] #result vector
+    for m in arrMat:
+        m = rrEchelonForm(m)
+        base = findBase(m)
+        resVec.append(base)
+    return resVec
+
+def InverseSPL(m,b):
+    MInverse = matInverse(m)
+    x = multiply_matrix(MInverse, b)
+    return x
+
+def matCofactor(m):
+    mc = [[0 for j in range(len(m[0]))] for i in range(len(m))]
+    a = 0
+    b = 0
+    multiply = 1
+    for i in range(len(m)):
+        if (i%2==0):
+            multiply = 1
+        else:
+            multiply = -1
+        for j in range(len(m[0])):
+            m1 = [[0 for j in range(len(m[0])-1)] for i in range(len(m)-1)]
+            for c in range(len(m)):
+                for d in range(len(m[0])):
+                    if (c!=i and d!=j):
+                        m1[a][b] = m[c][d]
+                        if (b+1 < len(m1[0])):
+                            b+=1
+                        elif (a+1 < len(m1)):
+                            a+=1
+                            b = 0
+            a = 0
+            b = 0
+            deter = determinant(m1)
+            mc[i][j] = multiply*deter
+            multiply*=-1
+    return mc
+    
+
+def adj(m):
+    if (len(m)==1 and len(m[0]) ==1):
+        m[0][0] = 1
+        return m
+    else:
+        madj = transpose(matCofactor(m))
+        return madj
+
+
+def matInverse(m):
+    deter = determinant(m)
+    MInverse = adj(m)
+    for i in range(len(MInverse)):
+        for j in range(len(MInverse[0])):
+            MInverse[i][j]*=(1/deter)
+    return MInverse
+
+def displayMatrix(m):
+    for i in range(len(m)):
+        for j in range(len(m[0])):
+            print(m[i][j], end=" ")
+        print()
+
+def displaySol(arr):
+    for a in arr:
+        print(a, end=" ")
+
+def rrEchelonForm(m):
+    mat = Matrix(m)
+    mat = mat.rref()
+    mr = [[0 for j in range(len(m[0]))] for i in range(len(m))]
+    a = 0
+    b = 0
+    for i in range(len(mat[0])):
+        mr[a][b] = mat[0][i]
+        if (b<len(m[0])-1):
+            b+=1
+        else:
+            a+=1
+            b=0
+    return mr
+
+def isRowZero(m,i):
+    for j in range(len(m[0])):
+        if (m[i][j]!=0):
+            return False
+    return True
+
+def findBase(m):
+    base = [[0 for j in range(len(m[0])-1)] for i in range (len(m[0])-1)]
+    for i in range(len(m)):
+        found = false
+        for j in range(len(m[0])-1):
+            if m[i][j] == 1 and not found:
+                found = true
+            elif found and m[i][j]!=0 :
+                base[j][i] = -m[i][j]
+    pop_rowIndex = []
+    for i in range(len(base)):
+        if (not(isRowZero(base,i))):
+            base[i][i] = 1
+        else:
+            pop_rowIndex.append(i)
+    
+    base_return = []
+    for i in range(len(m)):
+        if (not(isRowZero(base,i))):
+            base_return.append(base[i])
+
+    return base_return
