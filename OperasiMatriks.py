@@ -134,16 +134,16 @@ def eigenFinderMxN(m):
     return sorted(sol, reverse=True)
 
 def findEigen(m):
-    q, r = np.linalg.qr(m)
     for i in range(5000):
         q, r = np.linalg.qr(m)
-        m2 = r @ q
+        m = r @ q
 
     # Algortima QR
     row = len(r)
     eig = []
     for i in range(row):
-        eig.append(r[i][i])
+        x = r[i][i]
+        eig.append(abs(round(x)))
 
     eig = list(set(eig)) # drop duplicates
 
