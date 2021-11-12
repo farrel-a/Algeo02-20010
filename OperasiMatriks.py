@@ -1,4 +1,5 @@
 # INI ISINYA OPERASI MATRIKS BIAR ENAK
+import numpy as np
 
 def multiply_matrix(m1,m2):
     col = len(m2[0])
@@ -130,3 +131,20 @@ def eigenFinderMxN(m):
     det = modifiedDetCof(LambdaIminusA)
     sol = solveEquation(det)
     return sorted(sol, reverse=True)
+
+def findEigen(m):
+    q, r = np.linalg.qr(m)
+    for i in range(1000):
+        q, r = np.linalg.qr(m)
+        m2 = r @ q
+
+    # Algortima QR
+    row = len(r)
+    eig = []
+    for i in range(row):
+        eig.append(round(r[i][i]))
+
+    eig = list(set(eig)) # drop duplicates
+
+
+    return eig
