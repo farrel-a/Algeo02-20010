@@ -7,9 +7,8 @@ from sympy import *
 
 #find eigen vector for one matrix
 m = [
-    [10,0,2],
-    [0,10,4],
-    [2,4,2]
+    [11,1],
+    [1,11]
 ]
 eig = findEigen(m)
 print(eig)
@@ -20,6 +19,10 @@ print(arrVec)
 # eig = findEigen(mat)
 # print(eig)
 
+#sigma mat tester
+A = [[3,1,1],[-1,3,1]]
+sigma = findMatrixSigma(A)
+print(sigma)
 
 # x = InverseSPL(mat,[[0],[0],[0]])
 # displayMatrix(matInverse(mat))

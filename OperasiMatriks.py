@@ -281,3 +281,12 @@ def findBase(m):
             base_return.append(base[i])
 
     return base_return
+
+def findMatrixSigma(m):
+    mT = transpose(m)
+    M = multiply_matrix(m,mT)
+    eig = findEigen(M)
+    result = [[0 for j in range(len(m[0]))] for i in range(len(m))]
+    for i in range(len(m)):
+        result[i][i] = eig[i]**0.5
+    return result
