@@ -312,3 +312,15 @@ def findMatrixVT(m):
         res.append(normalized_v)
 
     return res
+
+def findMatU(m):
+    Trans = transpose(m)
+    mmT = multiply_matrix(m,Trans)
+    egen = findEigen(mmT)
+    egenvec = findEigenVector(egen,mmT)
+
+    result = []
+    for i in range(len(egenvec)):
+        hasilnorm_u = normalize_vector(egenvec[i][0])
+        result.append(hasilnorm_u)
+    return result
