@@ -1,6 +1,9 @@
 # INI ISINYA OPERASI MATRIKS BIAR ENAK
 import numpy as np
 from sympy import *
+import copy
+
+from sympy.polys.polyoptions import Sort
 
 def multiply_matrix(m1,m2):
     col = len(m2[0])
@@ -146,16 +149,16 @@ def findEigen(m):
         eig.append(abs(round(x)))
 
     eig = list(set(eig)) # drop duplicates
-
-
+    eig.sort(reverse=True)
     return eig
+
 
 def findEigenVector(eig, m):
     # eig : list of eigen
     # m : matrix input
     arrMat = []
     for ld in eig:
-        mat = m
+        mat = copy.deepcopy(m)
         #lambdaI-A
         for i in range(len(mat)):
             for j in range(len(mat[0])):
@@ -163,8 +166,10 @@ def findEigenVector(eig, m):
                     mat[i][j] = (ld-(mat[i][j])) #lambda - elem
                 else:
                     mat[i][j] = -mat[i][j]
+        for i in range(len(mat)):
             mat[i].append(0)
         arrMat.append(mat)
+
     resVec = [] #result vector
     for m in arrMat:
         m = rrEchelonForm(m)

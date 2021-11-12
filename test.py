@@ -6,19 +6,19 @@ from OperasiMatriks import *
 from sympy import *
 
 #find eigen vector for one matrix
-# mat = [
-#     [-10,0,-2,0],
-#     [0,-10,-4,0],
-#     [-2,-4,-2,0]
-# ]
-# m = rrEchelonForm(mat)
-# displayMatrix(m)
-# base = findBase(m)
-# print(base)
-
-mat = [[11,1],[1,11]]
-eig = findEigen(mat)
+m = [
+    [10,0,2],
+    [0,10,4],
+    [2,4,2]
+]
+eig = findEigen(m)
 print(eig)
+arrVec = findEigenVector(eig, m)
+print(arrVec)
+
+# mat = [[11,1],[1,11]]
+# eig = findEigen(mat)
+# print(eig)
 
 
 # x = InverseSPL(mat,[[0],[0],[0]])
