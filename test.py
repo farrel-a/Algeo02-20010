@@ -14,15 +14,18 @@ eig = findEigen(m)
 print(eig)
 arrVec = findEigenVector(eig, m)
 print(arrVec)
+print(normalize_vector([1,1]))
 
-# mat = [[11,1],[1,11]]
+#mat = [[11,1],[1,11]]
 # eig = findEigen(mat)
 # print(eig)
 
 #sigma mat tester
 A = [[3,1,1],[-1,3,1]]
 sigma = findMatrixSigma(A)
+VT = findMatrixVT(A)
 print(sigma)
+displayMatrix(VT)
 
 # x = InverseSPL(mat,[[0],[0],[0]])
 # displayMatrix(matInverse(mat))

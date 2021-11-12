@@ -290,3 +290,25 @@ def findMatrixSigma(m):
     for i in range(len(m)):
         result[i][i] = eig[i]**0.5
     return result
+
+def normalize_vector(v):
+    v2 = v
+    sum_squared = 0
+    for elmt in v2:
+        sum_squared += elmt**2
+    v_length = sqrt(sum_squared)
+
+
+    return (np.array(v2) / v_length)
+
+def findMatrixVT(m):
+    ATA = multiply_matrix(transpose(m),m)
+    eigen_values = findEigen(ATA)
+    res = []
+
+    arrVec = findEigenVector(eigen_values,ATA)
+    for i in range(len(arrVec)):
+        normalized_v = normalize_vector(arrVec[i][0])
+        res.append(normalized_v)
+
+    return res
