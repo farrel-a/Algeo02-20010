@@ -1,9 +1,10 @@
 # INI ISINYA OPERASI MATRIKS BIAR ENAK
 import numpy as np
+from scipy.sparse.construct import bmat
 from sympy import *
 import copy
-
-from sympy.polys.polyoptions import Sort
+import cv2
+from scipy.linalg import svd
 
 def multiply_matrix(m1,m2):
     col = len(m2[0])
@@ -65,90 +66,22 @@ def substractMat(m1,m2):    #m1-m2
 
     return res
 
-#modified cofactor determinant with element as equation
-def modifiedDetCof(m):
-    row = len(m)
-    col = len(m[0])
-    if (row==1 and col==1):   #base 1
-        return m
-    elif (row==2 and col==2): #base 2
-        max_degree1 = (len(m[0][0])-1) + (len(m[1][1])-1)
-        max_degree2 = (len(m[0][1])-1) + (len(m[1][0])-1)
-        if (max_degree1 > max_degree2):
-            arr = [0 for i in range(max_degree1+1)]
-        else:
-            arr = [0 for i in range(max_degree2+1)]
-        #[0][0] * [1][1]
-        for i in range(len(m[0][0])):
-            for j in range(len(m[1][1])):
-                arr[i+j] += m[0][0][i]*m[1][1][j]
-        
-        #[0][1] * [1][0]
-        for i in range (len(m[0][1])):
-            for j in range(len(m[1][0])):
-                arr[i+j] = arr[i+j] - (m[0][1][i]*m[1][0][j])
-        return arr
-    else:   #recursive
-        print()
-        #in progress
-
-#solve equation, input array =  [x^0, x^1, x^2,...]
-def solveEquation(arr):
-    if len(arr)==1:
-        return arr[0]
-    elif len(arr)==2: #[x^0,x^1] 
-        return arr[1]
-    elif len(arr)==3: #[x^0,x^1,x^2]
-        D = (arr[1]**2)-(4*arr[2]*arr[0]) #discriminant
-        if (D<0):
-            return []
-        else:
-            solution = []
-            sqrtD = D**0.5
-            s1 = (-arr[1]+sqrtD)/(2*arr[2])
-            solution.append(s1)
-            s2  = (-arr[1]-sqrtD)/(2*arr[2])
-            solution.append(s2)
-            return solution
-    else:
-        print()
-        #in progressm, higher nth degree polynomial
-
-
-def eigenFinderMxN(m):
-    A = m
-    At = transpose(m)
-    AAt = multiply_matrix(A,At) #MxM
-    row = len(AAt)
-    col = row
-
-    #[lambda^0,lambda^1,lambda^2,...]
-    LambdaIminusA = [[[0,0] for j in range(col)]for i in range(row)]
-    for i in range(row):
-        for j in range(col):
-            if (i==j):
-                LambdaIminusA[i][j][1] = 1
-                LambdaIminusA[i][j][0] = -AAt[i][j]
-            else:
-                LambdaIminusA[i][j][1] = 0
-                LambdaIminusA[i][j][0] = -AAt[i][j]
-    det = modifiedDetCof(LambdaIminusA)
-    sol = solveEquation(det)
-    return sorted(sol, reverse=True)
-
 def findEigen(m):
-    for i in range(5000):
+    mat = copy.deepcopy(m)
+    while(True):
         q, r = np.linalg.qr(m)
         m = r @ q
-
+        if len(r) >= len(mat[0]):
+            break
     # Algortima QR
     row = len(r)
     eig = []
     for i in range(row):
+        # print(i)
         x = r[i][i]
         eig.append(abs(round(x)))
 
-    eig = list(set(eig)) # drop duplicates
+    # eig = list(set(eig)) # drop duplicates
     eig.sort(reverse=True)
     return eig
 
@@ -177,56 +110,6 @@ def findEigenVector(eig, m):
         resVec.append(base)
     return resVec
 
-def InverseSPL(m,b):
-    MInverse = matInverse(m)
-    x = multiply_matrix(MInverse, b)
-    return x
-
-def matCofactor(m):
-    mc = [[0 for j in range(len(m[0]))] for i in range(len(m))]
-    a = 0
-    b = 0
-    multiply = 1
-    for i in range(len(m)):
-        if (i%2==0):
-            multiply = 1
-        else:
-            multiply = -1
-        for j in range(len(m[0])):
-            m1 = [[0 for j in range(len(m[0])-1)] for i in range(len(m)-1)]
-            for c in range(len(m)):
-                for d in range(len(m[0])):
-                    if (c!=i and d!=j):
-                        m1[a][b] = m[c][d]
-                        if (b+1 < len(m1[0])):
-                            b+=1
-                        elif (a+1 < len(m1)):
-                            a+=1
-                            b = 0
-            a = 0
-            b = 0
-            deter = determinant(m1)
-            mc[i][j] = multiply*deter
-            multiply*=-1
-    return mc
-    
-
-def adj(m):
-    if (len(m)==1 and len(m[0]) ==1):
-        m[0][0] = 1
-        return m
-    else:
-        madj = transpose(matCofactor(m))
-        return madj
-
-
-def matInverse(m):
-    deter = determinant(m)
-    MInverse = adj(m)
-    for i in range(len(MInverse)):
-        for j in range(len(MInverse[0])):
-            MInverse[i][j]*=(1/deter)
-    return MInverse
 
 def displayMatrix(m):
     for i in range(len(m)):
@@ -268,12 +151,9 @@ def findBase(m):
                 found = true
             elif found and m[i][j]!=0 :
                 base[j][i] = -m[i][j]
-    pop_rowIndex = []
     for i in range(len(base)):
         if (not(isRowZero(base,i))):
             base[i][i] = 1
-        else:
-            pop_rowIndex.append(i)
     
     base_return = []
     for i in range(len(m)):
@@ -287,8 +167,9 @@ def findMatrixSigma(m):
     M = multiply_matrix(m,mT)
     eig = findEigen(M)
     result = [[0 for j in range(len(m[0]))] for i in range(len(m))]
-    for i in range(len(m)):
-        result[i][i] = eig[i]**0.5
+    for k in range(len(m[0])):
+        result[k][k] = eig[k]**0.5
+        # print(i)
     return result
 
 def normalize_vector(v):
@@ -313,7 +194,7 @@ def findMatrixVT(m):
 
     return res
 
-def findMatU(m):
+def findMatrixU(m):
     Trans = transpose(m)
     mmT = multiply_matrix(m,Trans)
     egen = findEigen(mmT)
@@ -323,4 +204,104 @@ def findMatU(m):
     for i in range(len(egenvec)):
         hasilnorm_u = normalize_vector(egenvec[i][0])
         result.append(hasilnorm_u)
-    return result
+    return transpose(result)
+
+def ImgToMat(imgpath):
+    mat = cv2.imread(imgpath)
+    return mat
+
+def compressImg(imgpath, percent):
+    m = ImgToMat(imgpath)
+    BMat, GMat, RMat = cv2.split(m)
+    B = copy.deepcopy(BMat)
+    G = copy.deepcopy(GMat)
+    R = copy.deepcopy(RMat)
+    BMat = BMat.astype(float)
+    GMat = GMat.astype(float)
+    RMat = RMat.astype(float)
+    percent = 100 - percent
+    
+    #BMat SVD Decomposition
+    
+    U, S, Vt = svd(BMat)
+    k = int((percent/100) * len(U[0]))
+    print(k)
+    UNew = [[0 for j in range(k)] for i in range(len(U))]
+    for i in range(k):
+        for j in range(len(U)):
+            UNew[j][i] = U[j][i]
+    U = UNew
+
+    SNew = [[0 for j in range(k)] for i in range(k)]
+    for i in range(k):
+        SNew[i][i] = S[i]
+    S = SNew
+
+    VtNew = []
+    for i in range(k):
+        VtNew.append(Vt[i])
+    Vt = VtNew
+    
+    # print(f"{len(U)} x {len(U[0])}")
+    # print(f"{len(S)} x {len(S[0])}")
+    US = np.matmul(U,S)
+    # print(len(US[0]))
+    # print(len(Vt))
+    BRes = np.matmul(US,Vt)
+
+    #GMat SVD Decomposition
+    U, S, Vt = svd(GMat)
+    k = int((percent/100) * len(U[0]))
+    print(k)
+    UNew = [[0 for j in range(k)] for i in range(len(U))]
+    for i in range(k):
+        for j in range(len(U)):
+            UNew[j][i] = U[j][i]
+    U = UNew
+
+    SNew = [[0 for j in range(k)] for i in range(k)]
+    for i in range(k):
+        SNew[i][i] = S[i]
+    S = SNew
+
+    VtNew = []
+    for i in range(k):
+        VtNew.append(Vt[i])
+    Vt = VtNew
+    
+    US = np.matmul(U,S)
+    GRes = np.matmul(US,Vt)
+
+    #RMat SVD Decomposition
+    U, S, Vt = svd(RMat)
+    k = int((percent/100) * len(U[0]))
+    print(k)
+    UNew = [[0 for j in range(k)] for i in range(len(U))]
+    for i in range(k):
+        for j in range(len(U)):
+            UNew[j][i] = U[j][i]
+    U = UNew
+
+    SNew = [[0 for j in range(k)] for i in range(k)]
+    for i in range(k):
+        SNew[i][i] = S[i]
+    S = SNew
+
+    VtNew = []
+    for i in range(k):
+        VtNew.append(Vt[i])
+    Vt = VtNew
+    
+    US = np.matmul(U,S)
+    RRes = np.matmul(US,Vt)
+    
+    #conversion from float to uint8
+    BRes = BRes.astype(np.uint8)
+    GRes = GRes.astype(np.uint8)
+    RRes = RRes.astype(np.uint8)
+    
+    #merge BGR
+    img4 = cv2.merge([BRes,GRes,RRes])
+    # cv2.imshow('window',img4)
+    # cv2.waitKey(0)
+    cv2.imwrite("comp_amogus.jpg",img4)
