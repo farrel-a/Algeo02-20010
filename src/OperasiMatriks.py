@@ -1,6 +1,5 @@
 # INI ISINYA OPERASI MATRIKS BIAR ENAK
 import numpy as np
-from scipy.sparse.construct import bmat
 from sympy import *
 import copy
 import cv2

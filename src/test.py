@@ -60,7 +60,7 @@ name1 = "amogus.jpg"
 name2 = "test.jpeg"
 name3 = "pixel.png"
 print(os.getcwd())
-os.chdir("test")
+os.chdir("/Websitetest")
 compressImg(name1, 92)
 #compress 92%
 

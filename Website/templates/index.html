@@ -17,7 +17,8 @@
         </p>
     </form>
     {% if filename %}
-        <img src= "{{url_for('display_image', filename=filename) }}">
+        <img src= "{{ url_for('display_image', filename=filename) }}">
+        <img src= "{{ url_for('display_compressed_image', filename=com_fn) }}">
     {% endif %}
 </div>
 
