@@ -1,16 +1,15 @@
 # INI BUAT COBA-COBA AJA
 import numpy as np
-from tabulate import tabulate
-
+import os
 from OperasiMatriks import *
 from sympy import *
-from scipy.linalg import svd
+# from scipy.linalg import svd
 
 #find eigen vector for one matrix
-# m = [
-#     [11,1],
-#     [1,11]
-# ]
+m = np.array( [
+    [3,1,1],
+    [-1,3,1]
+])
 # eig = findEigen(m)
 # print(eig)
 # arrVec = findEigenVector(eig, m)
@@ -32,9 +31,7 @@ from scipy.linalg import svd
 # displayMatrix(X)
 
 #opencv tester
-path1 = "amogus.jpg"
-path2 = "test.jpeg"
-path3 = "pixel.png"
+
 # mat = ImgToMat(path1)
 #column - row - element (B-G-R) each elem
 # print(mat[499])
@@ -49,15 +46,27 @@ path3 = "pixel.png"
 # print(greenMat[497][490])
 # print(redMat[497][490])
 # b,g,r = cv2.split(mat)
+# m = findMatrixU(b)
 # print(g[497][490])
 # img = cv2.imread(path1)
 # img[0:150, 0:100] = [0,255,0] #row 0 - 150, 
 # cv2.imshow('window',img)
 # cv2.waitKey(0)
 
-#compress 95%
-compressImg(path1, 99)
 
+
+#make sure that the cwd is correct
+name1 = "amogus.jpg"
+name2 = "test.jpeg"
+name3 = "pixel.png"
+print(os.getcwd())
+os.chdir("test")
+compressImg(name1, 92)
+#compress 92%
+
+
+# U, Vt = svd(m,1)
+# print(U)
 
 # b,g,r = cv2.split(mat)
 # img = cv2.merge([b,g,r])

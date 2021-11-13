@@ -4,7 +4,10 @@ from scipy.sparse.construct import bmat
 from sympy import *
 import copy
 import cv2
-from scipy.linalg import svd
+from numpy.linalg import norm
+from random import normalvariate
+from math import sqrt
+
 
 def multiply_matrix(m1,m2):
     col = len(m2[0])
@@ -68,7 +71,7 @@ def substractMat(m1,m2):    #m1-m2
 
 def findEigen(m):
     # mat = copy.deepcopy(m)
-    for i in range(5):
+    for i in range(50):
         q, r = np.linalg.qr(m)
         m = r @ q
     # Algortima QR
@@ -98,7 +101,7 @@ def findEigenVector(eig, m):
                 else:
                     mat[i][j] = -mat[i][j]
         for i in range(len(mat)):
-            mat[i].append(0)
+            np.append(mat[i],0)
         arrMat.append(mat)
 
     resVec = [] #result vector
@@ -202,7 +205,7 @@ def findMatrixVT(m):
 
 def findMatrixU(m):
     Trans = transpose(m)
-    mmT = multiply_matrix(m,Trans)
+    mmT = np.matmul(m,Trans)
     egen = findEigen(mmT)
     egenvec = findEigenVector(egen,mmT)
 
@@ -226,100 +229,145 @@ def compressImg(imgpath, percent):
     BMat = BMat.astype(float)
     GMat = GMat.astype(float)
     RMat = RMat.astype(float)
-    percent = 100 - percent
+
+    if (percent == 0):
+        k = len(BMat[0])
+    else:
+        percent = 100 - percent
+        k = int(((percent/100)*len(BMat)*len(BMat[0]))/(len(BMat)+1+len(BMat[0])))
     
+    print(f"Computing for K = {k}")
+
     #BMat SVD Decomposition
-    
-    U, Sig, Vt = svd(BMat)
     S = findMatrixSigma(BMat)
-    k = int((percent/100) * len(U[0]))
-    print(k)
-    UNew = [[0 for j in range(k)] for i in range(len(U))]
-    for i in range(k):
-        for j in range(len(U)):
-            UNew[j][i] = U[j][i]
-    U = UNew
+    
+    U, Vt = svd(BMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
-    print(k)
     for i in range(k):
         SNew[i][i] = S[i][i]
     S = SNew
-    # print()
-    # print(S)
 
-    VtNew = []
-    for i in range(k):
-        VtNew.append(Vt[i])
-    Vt = VtNew
-    
-    # print(f"{len(U)} x {len(U[0])}")
-    # print(f"{len(S)} x {len(S[0])}")
-    # print(U)
-    # print()
-    # print(S)
     US = np.matmul(U,S)
-    # print()
-    # print(US)
-    # print(len(US[0]))
-    # print(len(Vt))
     BRes = np.matmul(US,Vt)
+    print("B matrix computation success")
+
 
     #GMat SVD Decomposition
-    U, Sig, Vt = svd(GMat)
     S = findMatrixSigma(GMat)
-    k = int((percent/100) * len(U[0]))
-    print(k)
-    UNew = [[0 for j in range(k)] for i in range(len(U))]
-    for i in range(k):
-        for j in range(len(U)):
-            UNew[j][i] = U[j][i]
-    U = UNew
+    
+    U, Vt = svd(GMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
         SNew[i][i] = S[i][i]
     S = SNew
 
-    VtNew = []
-    for i in range(k):
-        VtNew.append(Vt[i])
-    Vt = VtNew
-    
     US = np.matmul(U,S)
     GRes = np.matmul(US,Vt)
+    print("G matrix computation success")
+
 
     #RMat SVD Decomposition
-    U, Sig, Vt = svd(RMat)
     S = findMatrixSigma(RMat)
-    k = int((percent/100) * len(U[0]))
-    print(k)
-    UNew = [[0 for j in range(k)] for i in range(len(U))]
-    for i in range(k):
-        for j in range(len(U)):
-            UNew[j][i] = U[j][i]
-    U = UNew
+    
+    U, Vt = svd(RMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
         SNew[i][i] = S[i][i]
     S = SNew
-
-    VtNew = []
-    for i in range(k):
-        VtNew.append(Vt[i])
-    Vt = VtNew
     
     US = np.matmul(U,S)
     RRes = np.matmul(US,Vt)
+    print("R Matrix Computation Success")
     
+    print("BGR Matrix Computation Success !")
+
     #conversion from float to uint8
     BRes = BRes.astype(np.uint8)
     GRes = GRes.astype(np.uint8)
     RRes = RRes.astype(np.uint8)
     
     #merge BGR
-    img4 = cv2.merge([BRes,GRes,RRes])
-    # cv2.imshow('window',img4)
-    # cv2.waitKey(0)
-    cv2.imwrite("comp_amogus.jpg",img4)
+    img = cv2.merge([BRes,GRes,RRes])
+    filename = filenamecvt(imgpath)
+    cv2.imwrite(filename,img)
+    print(f"File saved as {filename} in test folder !")
+
+def filenamecvt(name):
+    imgname = ""
+    i = 0
+    while(name[i]!="."):
+        imgname += name[i]
+        i+=1
+    ext = ""
+    i = -1
+    while(name[i]!="."):
+        ext += name[i]
+        i-=1
+    extension=""
+    for i in range(len(ext)):
+        extension+=ext[len(ext)-1-i]
+    filename = f"{imgname}_compressed.{extension}"
+    return filename
+
+
+def randomUnitVector(n):
+    unnormalized = [normalvariate(0, 1) for _ in range(n)]
+    theNorm = sqrt(sum(x * x for x in unnormalized))
+    return [x / theNorm for x in unnormalized]
+
+
+def svd_1d(A, epsilon=1e-10):
+    # 1D SVD
+    n, m = A.shape
+    x = randomUnitVector(min(n,m))
+    lastV = None
+    currentV = x
+
+    if n > m:
+        B = np.dot(A.T, A)
+    else:
+        B = np.dot(A, A.T)
+
+    iterations = 0
+    while True:
+        iterations += 1
+        lastV = currentV
+        currentV = np.dot(B, lastV)
+        currentV = currentV / norm(currentV)
+
+        if abs(np.dot(currentV, lastV)) > 1 - epsilon:
+            return currentV
+
+
+def svd(A, k=None, epsilon=1e-10):
+
+    A = np.array(A, dtype=float)
+    n, m = A.shape
+    svdSoFar = []
+    if k is None:
+        k = min(n, m)
+
+    for i in range(k):
+        matrixFor1D = A.copy()
+
+        for singularValue, u, v in svdSoFar[:i]:
+            matrixFor1D -= singularValue * np.outer(u, v)
+
+        if n > m:
+            v = svd_1d(matrixFor1D, epsilon=epsilon)  
+            u_unnormalized = np.dot(A, v)
+            sigma = norm(u_unnormalized) 
+            u = u_unnormalized / sigma
+        else:
+            u = svd_1d(matrixFor1D, epsilon=epsilon) 
+            v_unnormalized = np.dot(A.T, u)
+            sigma = norm(v_unnormalized) 
+            v = v_unnormalized / sigma
+
+        svdSoFar.append((sigma, u, v))
+
+    singularValues, us, vs = [np.array(x) for x in zip(*svdSoFar)]
+    return us.T, vs
