@@ -189,8 +189,9 @@ def findMatrixVT(m):
 
     arrVec = findEigenVector(eigen_values,ATA)
     for i in range(len(arrVec)):
-        normalized_v = normalize_vector(arrVec[i][0])
-        res.append(normalized_v)
+        for j in range (len(arrVec[i])):
+            normalized_v = normalize_vector(arrVec[i][j])
+            res.append(normalized_v)
 
     return res
 
@@ -202,8 +203,9 @@ def findMatrixU(m):
 
     result = []
     for i in range(len(egenvec)):
-        hasilnorm_u = normalize_vector(egenvec[i][0])
-        result.append(hasilnorm_u)
+        for j in range(len(egenvec[i])):
+            hasilnorm_u = normalize_vector(egenvec[i][j])
+            result.append(hasilnorm_u)
     return transpose(result)
 
 def ImgToMat(imgpath):
