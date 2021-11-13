@@ -2,9 +2,9 @@
 import numpy as np
 from tabulate import tabulate
 
-#from OperasiMatriks import *
-#from sympy import *
-#from scipy.linalg import svd
+from OperasiMatriks import *
+from sympy import *
+from scipy.linalg import svd
 
 #find eigen vector for one matrix
 # m = [
@@ -32,9 +32,9 @@ from tabulate import tabulate
 # displayMatrix(X)
 
 #opencv tester
-#path1 = "amogus.jpg"
-#path2 = "test.jpeg"
-#path3 = "pixel.png"
+path1 = "amogus.jpg"
+path2 = "test.jpeg"
+path3 = "pixel.png"
 # mat = ImgToMat(path1)
 #column - row - element (B-G-R) each elem
 # print(mat[499])
@@ -56,7 +56,7 @@ from tabulate import tabulate
 # cv2.waitKey(0)
 
 #compress 95%
-#compressImg(path1, 99)
+compressImg(path1, 99)
 
 
 # b,g,r = cv2.split(mat)
@@ -90,5 +90,5 @@ from tabulate import tabulate
 # print(tabulate(r@q))
 # print(findEigen(m2))
 
-l = [ [ [1,1,1], [2,2,2] ],[[1,1,1]]]
-print(len(l[0]))
+# l = [ [ [1,1,1], [2,2,2] ],[[1,1,1]]]
+# print(len(l[0]))

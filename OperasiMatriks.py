@@ -67,12 +67,10 @@ def substractMat(m1,m2):    #m1-m2
     return res
 
 def findEigen(m):
-    mat = copy.deepcopy(m)
-    while(True):
+    # mat = copy.deepcopy(m)
+    for i in range(5):
         q, r = np.linalg.qr(m)
         m = r @ q
-        if len(r) >= len(mat[0]):
-            break
     # Algortima QR
     row = len(r)
     eig = []
@@ -164,12 +162,19 @@ def findBase(m):
 
 def findMatrixSigma(m):
     mT = transpose(m)
-    M = multiply_matrix(m,mT)
+    M = np.matmul(m,mT)
     eig = findEigen(M)
-    result = [[0 for j in range(len(m[0]))] for i in range(len(m))]
-    for k in range(len(m[0])):
-        result[k][k] = eig[k]**0.5
-        # print(i)
+    if (len(m[0])<len(m)):
+        result = [[0.0 for j in range(len(m[0]))] for i in range(len(m))]
+        for k in range(len(m[0])):
+            result[k][k] = eig[k]**0.5
+            # print(i)
+    else:
+        result = [[0.0 for j in range(len(m))] for i in range(len(m[0]))]
+        for k in range(len(m)):
+            result[k][k] = eig[k]**0.5
+            # print(i)
+
     return result
 
 def normalize_vector(v):
@@ -225,7 +230,8 @@ def compressImg(imgpath, percent):
     
     #BMat SVD Decomposition
     
-    U, S, Vt = svd(BMat)
+    U, Sig, Vt = svd(BMat)
+    S = findMatrixSigma(BMat)
     k = int((percent/100) * len(U[0]))
     print(k)
     UNew = [[0 for j in range(k)] for i in range(len(U))]
@@ -235,9 +241,12 @@ def compressImg(imgpath, percent):
     U = UNew
 
     SNew = [[0 for j in range(k)] for i in range(k)]
+    print(k)
     for i in range(k):
-        SNew[i][i] = S[i]
+        SNew[i][i] = S[i][i]
     S = SNew
+    # print()
+    # print(S)
 
     VtNew = []
     for i in range(k):
@@ -246,13 +255,19 @@ def compressImg(imgpath, percent):
     
     # print(f"{len(U)} x {len(U[0])}")
     # print(f"{len(S)} x {len(S[0])}")
+    # print(U)
+    # print()
+    # print(S)
     US = np.matmul(U,S)
+    # print()
+    # print(US)
     # print(len(US[0]))
     # print(len(Vt))
     BRes = np.matmul(US,Vt)
 
     #GMat SVD Decomposition
-    U, S, Vt = svd(GMat)
+    U, Sig, Vt = svd(GMat)
+    S = findMatrixSigma(GMat)
     k = int((percent/100) * len(U[0]))
     print(k)
     UNew = [[0 for j in range(k)] for i in range(len(U))]
@@ -263,7 +278,7 @@ def compressImg(imgpath, percent):
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
-        SNew[i][i] = S[i]
+        SNew[i][i] = S[i][i]
     S = SNew
 
     VtNew = []
@@ -275,7 +290,8 @@ def compressImg(imgpath, percent):
     GRes = np.matmul(US,Vt)
 
     #RMat SVD Decomposition
-    U, S, Vt = svd(RMat)
+    U, Sig, Vt = svd(RMat)
+    S = findMatrixSigma(RMat)
     k = int((percent/100) * len(U[0]))
     print(k)
     UNew = [[0 for j in range(k)] for i in range(len(U))]
@@ -286,7 +302,7 @@ def compressImg(imgpath, percent):
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
-        SNew[i][i] = S[i]
+        SNew[i][i] = S[i][i]
     S = SNew
 
     VtNew = []
