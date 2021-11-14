@@ -1,4 +1,6 @@
-# INI ISINYA OPERASI MATRIKS BIAR ENAK
+# Matrix Operations
+
+import time
 import numpy as np
 from sympy import *
 import copy
@@ -154,6 +156,10 @@ def ImgToMat(imgpath):
     return mat
 
 def compressImg(imgpath, percent_compression):
+    
+    # Start time calculation
+    startTime = time.time()
+
     # Generate matrix from imgpath
     m = ImgToMat(imgpath)
 
@@ -243,6 +249,16 @@ def compressImg(imgpath, percent_compression):
 
     # notify
     print(f"File saved as {filename} in test folder !")
+
+    # stop time calculation
+    stopTime = time.time()
+
+    # calculate runtime
+    runTime = stopTime-startTime
+    print(f"Runtime : {runTime:.2f} s")
+
+    # return runtime
+    return runTime
 
 def filenamecvt(name):
     #convert filename to add "_compressed" at the end of filename
