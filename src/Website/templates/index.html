@@ -34,6 +34,8 @@
             <a href="{{ url_for('display_compressed_image', filename=com_fn) }}" download="{{ url_for('display_compressed_image', filename=com_fn) }}">
                 <img class ="pict_after" src= "{{ url_for('display_compressed_image', filename=com_fn) }}" alt="after">
             </a>
+            <p> Image pixel difference percentage: {{rat}}% </p>
+            <p> Image compression time: {{rt}} seconds</p>
         {% endif %}
     </div>
 
