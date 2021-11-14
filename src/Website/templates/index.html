@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <head>
-
+    <link rel="stylesheet" href="../static/style.css"/>
+    <link href="https://www.dafontfree.net/embed/Y29vcGVyLWJsYWNrLXJlZ3VsYXImZGF0YS8yNC9jLzExOTYxOC9DT09QQkwudHRm" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet">
 </head>
 
 <body>
-<div align="center">
-    <h1> IMAGE COMPRESSION </h1>
-`   <form method="post" action="/" enctype="multipart/form-data">
-        <dl>
+    <div align="center">
+        <h1> COMPRESS IMAGES </h1>
+        <form method="post" action="/" enctype="multipart/form-data">
+            <dl>
+                <p>
+                    <input type = "file" id="file" name="file" autocomplete="off" required>
+                    <label for = "file"> 
+                        <span class="material-icons">
+                            add_a_photo
+                        </span> &nbsp;
+                        Choose a Photo
+                    </label>
+                </p>
+                <p class = "persen">
+                    <input class = "slider" type= "range" name="ratio" autocomplete="off" required min="0" max ="100" value="50" oninput="this.nextElementSibling.value = this.value">
+                    <output>50</output>
+                </p>
+            </dl>
             <p>
-                <input type = "file" name="file" autocomplete="off" required>
+                <input class = "submission" type="submit" value="Submit">
             </p>
-            <p>
-                <input type= "number" name="ratio" autocomplete="off" required>
-            </p>
-        </dl>
-        <p>
-            <input type="submit" value="Submit">
-        </p>
-    </form>
-    {% if filename %}
-        <img src= "{{ url_for('display_image', filename=filename) }}">
-        <img src= "{{ url_for('display_compressed_image', filename=com_fn) }}">
-    {% endif %}
-</div>
+        </form>
+        {% if filename %}
+            <img class = "pict_before" src= "{{ url_for('display_image', filename=filename) }}">
+            <a href="{{ url_for('display_compressed_image', filename=com_fn) }}" download="{{ url_for('display_compressed_image', filename=com_fn) }}">
+                <img class ="pict_after" src= "{{ url_for('display_compressed_image', filename=com_fn) }}" alt="after">
+            </a>
+        {% endif %}
+    </div>
 
 </body>
