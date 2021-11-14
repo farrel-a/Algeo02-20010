@@ -21,8 +21,10 @@ $ python -m pip install flask
 $ git clone https://github.com/farrel-a/Algeo02-20010.git
 ```
 
-3. Buka IDE seperti vscode untuk membuka folder `/Algeo02-20010`
+3. Buka terminal dan jalankan command ini.
+```sh
+$ cd Algeo02-20010/src
+$ python test.py
+```
 
-4. Run `main.py` pada `/src` dengan menekan tombol run code
-
-5. Copy alamat website pada terminal dan paste pada browser atau click alamat pada terminal.
+4. Copy alamat website pada terminal dan paste pada browser atau click alamat pada terminal.
