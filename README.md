@@ -1,6 +1,6 @@
 # Algeo02-20010
 
-# Tugas Beser Aljabar Linier dan Geometri Aplikasi Nilai Eigen dan Vektor Eigen dalam Kompresi Gambar (*Image Compression*)
+# Tugas Besar Aljabar Linier dan Geometri Aplikasi Nilai Eigen dan Vektor Eigen dalam Kompresi Gambar (*Image Compression*)
 
 ## 13520010 - Ken Kalang Al Qalyubi
 ## 13520110 - Farrel Ahmad
