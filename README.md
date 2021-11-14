@@ -24,7 +24,7 @@ $ git clone https://github.com/farrel-a/Algeo02-20010.git
 3. Buka terminal dan jalankan command ini.
 ```sh
 $ cd Algeo02-20010/src
-$ python test.py
+$ python main.py
 ```
 
 4. Copy alamat website pada terminal dan paste pada browser atau click alamat pada terminal.
