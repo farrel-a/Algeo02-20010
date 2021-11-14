@@ -8,19 +8,6 @@ from random import normalvariate
 from math import sqrt
 
 
-def multiply_matrix(m1,m2):
-    col = len(m2[0])
-    row = len(m1)
-    m3 = [[0 for j in range(col)] for i in range(row)]
-
-    for i in range(0,row):
-        for j in range(0,col):
-            m3[i][j] = 0
-            for k in range(0,len(m1[0])):
-                m3[i][j] += m1[i][k] * m2[k][j]
-
-    return m3
-
 def transpose(m):
     col = len(m)
     row = len(m[0])
@@ -31,45 +18,7 @@ def transpose(m):
             hasil[i][j] = m[j][i]
     return hasil
 
-def determinant(m):
-    col = len(m[0])
-    row = len(m)
-    det = 0
-    if (row == 2) and (col == 2):
-        det = (m[0][0]*m[1][1]) - (m[0][1]*m[1][0])
-    else:
-        sign = 1
-        for i in range(0,col):
-            kofaktor = m[0][i]
-            valid_cols = [0 for i in range(col-1)]
-            valid_col_idx = 0
-            for j in range(0,col):
-                if (j != i):
-                    valid_cols[valid_col_idx] = j
-                    valid_col_idx += 1
-            m2 = [[0 for j in range(col-1)] for i in range(row-1)]
-            for new_row in range(len(m2)):
-                for new_col in range(len(m2[0])):
-                    valid_col = valid_cols[new_col]
-                    m2[new_row][new_col] = m[new_row+1][valid_col]
-
-            det += sign * kofaktor * determinant(m2)
-            sign = sign * (-1)
-
-    return det
-
-def substractMat(m1,m2):    #m1-m2
-    row = len(m1)
-    col = len(m1[0])
-    res = [[0 for j in range(col)]for i in range(row)]
-    for i in range(row):
-        for j in range(col):
-            res[i][j] = m1[i][j] - m2[i][j]
-
-    return res
-
 def findEigen(m):
-    # mat = copy.deepcopy(m)
     for i in range(50):
         q, r = np.linalg.qr(m)
         m = r @ q
@@ -189,37 +138,12 @@ def normalize_vector(v):
 
     return (np.array(v2) / v_length)
 
-def findMatrixVT(m):
-    ATA = multiply_matrix(transpose(m),m)
-    eigen_values = findEigen(ATA)
-    res = []
-
-    arrVec = findEigenVector(eigen_values,ATA)
-    for i in range(len(arrVec)):
-        for j in range (len(arrVec[i])):
-            normalized_v = normalize_vector(arrVec[i][j])
-            res.append(normalized_v)
-
-    return res
-
-def findMatrixU(m):
-    Trans = transpose(m)
-    mmT = np.matmul(m,Trans)
-    egen = findEigen(mmT)
-    egenvec = findEigenVector(egen,mmT)
-
-    result = []
-    for i in range(len(egenvec)):
-        for j in range(len(egenvec[i])):
-            hasilnorm_u = normalize_vector(egenvec[i][j])
-            result.append(hasilnorm_u)
-    return transpose(result)
 
 def ImgToMat(imgpath):
     mat = cv2.imread(imgpath)
     return mat
 
-def compressImg(imgpath, percent):
+def compressImg(imgpath, percent_compression):
     m = ImgToMat(imgpath)
     BMat, GMat, RMat = cv2.split(m)
     B = copy.deepcopy(BMat)
@@ -229,18 +153,22 @@ def compressImg(imgpath, percent):
     GMat = GMat.astype(float)
     RMat = RMat.astype(float)
 
-    if (percent == 0):
+    if (percent_compression == 0):
         k = len(BMat[0])
-    else:
-        percent = 100 - percent
-        k = int(((percent/100)*len(BMat)*len(BMat[0]))/(len(BMat)+1+len(BMat[0])))
     
+    elif (percent_compression == 100):
+        k = 1
+    else:
+        percent_image = 100 - percent_compression
+        k = int(((percent_image/100)*len(BMat)*len(BMat[0]))/(len(BMat)+1+len(BMat[0])))
+    
+    print(f"Computing for {percent_compression}% compression")
     print(f"Computing for K = {k}")
 
     #BMat SVD Decomposition
     S = findMatrixSigma(BMat)
     
-    U, Vt = svd(BMat,k)
+    U, Vt = findMatrixUandVt(BMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
@@ -255,7 +183,7 @@ def compressImg(imgpath, percent):
     #GMat SVD Decomposition
     S = findMatrixSigma(GMat)
     
-    U, Vt = svd(GMat,k)
+    U, Vt = findMatrixUandVt(GMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
@@ -270,7 +198,7 @@ def compressImg(imgpath, percent):
     #RMat SVD Decomposition
     S = findMatrixSigma(RMat)
     
-    U, Vt = svd(RMat,k)
+    U, Vt = findMatrixUandVt(RMat,k)
 
     SNew = [[0 for j in range(k)] for i in range(k)]
     for i in range(k):
@@ -279,9 +207,9 @@ def compressImg(imgpath, percent):
     
     US = np.matmul(U,S)
     RRes = np.matmul(US,Vt)
-    print("R Matrix Computation Success")
+    print("R matrix computation Success")
     
-    print("BGR Matrix Computation Success !")
+    print("BGR matrix computation success !")
 
     #conversion from float to uint8
     BRes = BRes.astype(np.uint8)
@@ -295,6 +223,7 @@ def compressImg(imgpath, percent):
     print(f"File saved as {filename} in test folder !")
 
 def filenamecvt(name):
+    #convert filename to add "_compressed" at the end of filename
     imgname = ""
     i = 0
     while(name[i]!="."):
@@ -312,61 +241,71 @@ def filenamecvt(name):
     return filename
 
 
-def randomUnitVector(n):
-    unnormalized = [normalvariate(0, 1) for _ in range(n)]
-    theNorm = sqrt(sum(x * x for x in unnormalized))
-    return [x / theNorm for x in unnormalized]
+def randUnitVec(n):
+    unnormalized = []
+    for i in range(n):
+        unnormalized.append(normalvariate(0, 1))
+
+    sum = 0
+    for x in unnormalized:
+        sum += x**2
+
+    norm = sqrt(sum)
+    result = []
+
+    for i in range(n):
+        result.append(unnormalized[i]/norm)
+    return result
 
 
-def svd_1d(A, epsilon=1e-10):
-    # 1D SVD
-    n, m = A.shape
-    x = randomUnitVector(min(n,m))
+def svd1d(A, epsilon=1e-10):
+    # SVD computation for 1D
+    m = len(A)    # row size
+    n = len(A[0]) # col size
+    x = randUnitVec(min(m,n))
+    currV = x
     lastV = None
-    currentV = x
 
-    if n > m:
-        B = np.dot(A.T, A)
-    else:
-        B = np.dot(A, A.T)
+    B = np.dot(A.T, A) if (m > n) else np.dot(A, A.T)
 
-    iterations = 0
-    while True:
-        iterations += 1
-        lastV = currentV
-        currentV = np.dot(B, lastV)
-        currentV = currentV / norm(currentV)
-
-        if abs(np.dot(currentV, lastV)) > 1 - epsilon:
-            return currentV
+    iter = 0
+    flag = True
+    while flag:
+        lastV = currV
+        currV = (np.dot(B, lastV)) / (norm(np.dot(B, lastV)))
+        iter += 1
+        if abs(np.dot(currV, lastV)) > 1 - epsilon:
+            flag = False
+    return currV
 
 
-def svd(A, k=None, epsilon=1e-10):
-
+def findMatrixUandVt(A, k=None, epsilon=1e-10):
+    # return U matrix and Vt matrix
     A = np.array(A, dtype=float)
-    n, m = A.shape
-    svdSoFar = []
+    m = len(A)    # row size
+    n = len(A[0]) # col size
+    svdArr = []
     if k is None:
-        k = min(n, m)
+        k = min(m, n)
 
     for i in range(k):
-        matrixFor1D = A.copy()
+        matrix1D = A.copy()
 
-        for singularValue, u, v in svdSoFar[:i]:
-            matrixFor1D -= singularValue * np.outer(u, v)
+        for singularValue, u, v in svdArr[:i]:
+            matrix1D -= singularValue * np.outer(u, v)
 
-        if n > m:
-            v = svd_1d(matrixFor1D, epsilon=epsilon)  
-            u_unnormalized = np.dot(A, v)
-            sigma = norm(u_unnormalized) 
-            u = u_unnormalized / sigma
+        if m > n:
+            v = svd1d(matrix1D, epsilon=epsilon)  
+            sig = norm(np.dot(A, v)) 
+            u = (np.dot(A, v)) / sig
         else:
-            u = svd_1d(matrixFor1D, epsilon=epsilon) 
-            v_unnormalized = np.dot(A.T, u)
-            sigma = norm(v_unnormalized) 
-            v = v_unnormalized / sigma
+            u = svd1d(matrix1D, epsilon=epsilon) 
+            sig = norm(np.dot(A.T, u)) 
+            v = (np.dot(A.T, u)) / sig
 
-        svdSoFar.append((sigma, u, v))
+        svdArr.append((sig, u, v))
 
-    singularValues, us, vs = [np.array(x) for x in zip(*svdSoFar)]
-    return us.T, vs
+    singval, u, v = [np.array(x) for x in zip(*svdArr)]
+    U = u.T
+    Vt = v
+    return U, Vt
