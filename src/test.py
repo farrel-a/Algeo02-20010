@@ -1,8 +1,7 @@
 # INI BUAT COBA-COBA AJA
-import numpy as np
 import os
-from OperasiMatriks import *
-from sympy import *
+from src.Website.OperasiMatriks import *
+
 # from scipy.linalg import svd
 
 #find eigen vector for one matrix

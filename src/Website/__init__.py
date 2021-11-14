@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
-import urllib.request
 from pathlib import Path
-from src.OperasiMatriks import compressImg
+from .OperasiMatriks import compressImg
 import os
-from werkzeug.utils import secure_filename
-
 
 
 def create_app():
@@ -38,13 +35,14 @@ def create_app():
 
             if file and allowed_file(file.filename):
                 filename = file.filename
+                ratio = int(request.form.get('ratio'))
                 path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 print(filename)
                 file.save(path)
                 fn = os.path.splitext(path)
                 root,ext = os.path.splitext(path)
                 compressed_filename = Path(fn[0] + "_compressed").stem + ext
-                compressImg(path, 50)
+                compressImg(path,ratio)
                 print(compressed_filename)
                 flash('Image sucsessfully uploaded and displayed')
                 return render_template('index.html', filename=filename,com_fn = compressed_filename)
