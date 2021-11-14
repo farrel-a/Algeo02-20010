@@ -9,6 +9,7 @@ from math import sqrt
 
 
 def transpose(m):
+    # return transpose of m
     col = len(m)
     row = len(m[0])
     hasil = [[0 for j in range(col)] for i in range(row)]
@@ -19,6 +20,7 @@ def transpose(m):
     return hasil
 
 def findEigen(m):
+    # return eigen values
     for i in range(50):
         q, r = np.linalg.qr(m)
         m = r @ q
@@ -61,16 +63,19 @@ def findEigenVector(eig, m):
 
 
 def displayMatrix(m):
+    # display matrix elements
     for i in range(len(m)):
         for j in range(len(m[0])):
             print(m[i][j], end=" ")
         print()
 
 def displaySol(arr):
+    # display solution
     for a in arr:
         print(a, end=" ")
 
 def rrEchelonForm(m):
+    # retrurn row reduced echelon form of m
     mat = Matrix(m)
     mat = mat.rref()
     mr = [[0 for j in range(len(m[0]))] for i in range(len(m))]
@@ -86,12 +91,14 @@ def rrEchelonForm(m):
     return mr
 
 def isRowZero(m,i):
+    # return whether row-i in m is zero row
     for j in range(len(m[0])):
         if (m[i][j]!=0):
             return False
     return True
 
 def findBase(m):
+    # return base of M
     base = [[0 for j in range(len(m[0])-1)] for i in range (len(m[0])-1)]
     for i in range(len(m)):
         found = false
@@ -112,6 +119,7 @@ def findBase(m):
     return base_return
 
 def findMatrixSigma(m):
+    # return sigma matrix of SVD
     mT = transpose(m)
     M = np.matmul(m,mT)
     eig = findEigen(M)
@@ -129,6 +137,7 @@ def findMatrixSigma(m):
     return result
 
 def normalize_vector(v):
+    # return normalized vector
     v2 = v
     sum_squared = 0
     for elmt in v2:
@@ -140,24 +149,31 @@ def normalize_vector(v):
 
 
 def ImgToMat(imgpath):
+    # return matrix of image pixel
     mat = cv2.imread(imgpath)
     return mat
 
 def compressImg(imgpath, percent_compression):
+    # Generate matrix from imgpath
     m = ImgToMat(imgpath)
+
+    # Splig B, G, and R matrix
     BMat, GMat, RMat = cv2.split(m)
-    B = copy.deepcopy(BMat)
-    G = copy.deepcopy(GMat)
-    R = copy.deepcopy(RMat)
+
+    # Conversion to float
     BMat = BMat.astype(float)
     GMat = GMat.astype(float)
     RMat = RMat.astype(float)
 
+    # 0% compression is equal to not compressed picture
     if (percent_compression == 0):
         k = len(BMat[0])
     
+    # 100% compression is equal to k = 1 compression
     elif (percent_compression == 100):
         k = 1
+    
+    # percentage calculation
     else:
         percent_image = 100 - percent_compression
         k = int(((percent_image/100)*len(BMat)*len(BMat[0]))/(len(BMat)+1+len(BMat[0])))
@@ -165,7 +181,7 @@ def compressImg(imgpath, percent_compression):
     print(f"Computing for {percent_compression}% compression")
     print(f"Computing for K = {k}")
 
-    #BMat SVD Decomposition
+    # BMat SVD Decomposition
     S = findMatrixSigma(BMat)
     
     U, Vt = findMatrixUandVt(BMat,k)
@@ -180,7 +196,7 @@ def compressImg(imgpath, percent_compression):
     print("B matrix computation success")
 
 
-    #GMat SVD Decomposition
+    # GMat SVD Decomposition
     S = findMatrixSigma(GMat)
     
     U, Vt = findMatrixUandVt(GMat,k)
@@ -195,7 +211,7 @@ def compressImg(imgpath, percent_compression):
     print("G matrix computation success")
 
 
-    #RMat SVD Decomposition
+    # RMat SVD Decomposition
     S = findMatrixSigma(RMat)
     
     U, Vt = findMatrixUandVt(RMat,k)
@@ -211,15 +227,21 @@ def compressImg(imgpath, percent_compression):
     
     print("BGR matrix computation success !")
 
-    #conversion from float to uint8
+    # conversion from float to uint8
     BRes = BRes.astype(np.uint8)
     GRes = GRes.astype(np.uint8)
     RRes = RRes.astype(np.uint8)
     
-    #merge BGR
+    # merge BGR
     img = cv2.merge([BRes,GRes,RRes])
+
+    # generate new filename
     filename = filenamecvt(imgpath)
+
+    # save picture
     cv2.imwrite(filename,img)
+
+    # notify
     print(f"File saved as {filename} in test folder !")
 
 def filenamecvt(name):
@@ -244,7 +266,8 @@ def filenamecvt(name):
 def randUnitVec(n):
     unnormalized = []
     for i in range(n):
-        unnormalized.append(normalvariate(0, 1))
+        x = normalvariate(0,1)
+        unnormalized.append(x)
 
     sum = 0
     for x in unnormalized:
@@ -254,17 +277,19 @@ def randUnitVec(n):
     result = []
 
     for i in range(n):
-        result.append(unnormalized[i]/norm)
+        res = unnormalized[i]/norm
+        result.append(res)
+
     return result
 
 
-def svd1d(A, epsilon=1e-10):
+def svd1d(A, epsilon):
     # SVD computation for 1D
     m = len(A)    # row size
     n = len(A[0]) # col size
-    x = randUnitVec(min(m,n))
+    minimum = min(m,n)
+    x = randUnitVec(minimum)
     currV = x
-    lastV = None
 
     B = np.dot(A.T, A) if (m > n) else np.dot(A, A.T)
 
@@ -273,39 +298,47 @@ def svd1d(A, epsilon=1e-10):
     while flag:
         lastV = currV
         currV = (np.dot(B, lastV)) / (norm(np.dot(B, lastV)))
-        iter += 1
         if abs(np.dot(currV, lastV)) > 1 - epsilon:
             flag = False
+        iter += 1
     return currV
 
 
-def findMatrixUandVt(A, k=None, epsilon=1e-10):
+def findMatrixUandVt(A, k):
     # return U matrix and Vt matrix
+    epsilon = 1e-10
     A = np.array(A, dtype=float)
     m = len(A)    # row size
     n = len(A[0]) # col size
     svdArr = []
-    if k is None:
-        k = min(m, n)
 
-    for i in range(k):
+    #power iteration
+    i = 0
+    flag = True
+    while (flag):
         matrix1D = A.copy()
 
-        for singularValue, u, v in svdArr[:i]:
+        for u, singularValue,v in svdArr[:i]:
             matrix1D -= singularValue * np.outer(u, v)
 
-        if m > n:
-            v = svd1d(matrix1D, epsilon=epsilon)  
-            sig = norm(np.dot(A, v)) 
-            u = (np.dot(A, v)) / sig
-        else:
-            u = svd1d(matrix1D, epsilon=epsilon) 
+        if m <= n:
+            u = svd1d(matrix1D, epsilon) 
             sig = norm(np.dot(A.T, u)) 
-            v = (np.dot(A.T, u)) / sig
+            v = (np.dot(A.T, u)) / (norm(np.dot(A.T, u)))
+        else:
+            v = svd1d(matrix1D, epsilon)  
+            sig = norm(np.dot(A, v)) 
+            u = (np.dot(A, v)) / (norm(np.dot(A, v)))
 
-        svdArr.append((sig, u, v))
 
-    singval, u, v = [np.array(x) for x in zip(*svdArr)]
+        svdArr.append((u, sig, v))
+        i+=1
+        if (i>=k):
+            flag = False
+            # quit loop
+
+    #result
+    u, singval, v = [np.array(x) for x in zip(*svdArr)]
     U = u.T
     Vt = v
     return U, Vt
