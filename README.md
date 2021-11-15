@@ -18,6 +18,11 @@
 ## Introduction <a name = "intro"></a>
 Program ini adalah program kompresi gambar/*Image Compression* menggunakan metode SVD. SVD adalah *Singular Value Decomposition* sebuah metode dekomposisi matriks menjadi matriks U, Sigma, dan Vt. Dengan mengambil K kolom dari U, K diagonal Sigma, dan K baris dari Vt. Gambar tersebut direkonstruksi kembali melalui perkalinan matriks U * Sigma * Vt. Setelah itu, gambar dapat terkompresi karena semua informasi penting berada pada K awal-awal dari matriks-matriks dekomposisi tersebut.
 
+Struktur directory :
+- src : source code frontend dan backend
+- doc : laporan
+- test : gambar-gambar masukan dan beberapa hasil kompresi
+
 <br>
 
 ## Program Setup <a name = "setup"></a>
