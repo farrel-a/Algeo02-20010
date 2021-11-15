@@ -8,7 +8,19 @@
 
 <br>
 
-## How to Run
+## Table of Contents
+- [Introduction](#intro)
+- [Program Setup](#setup)
+- [Program Example](#pe)
+
+<br>
+
+## Introduction <a name = "intro"></a>
+Program ini adalah program kompresi gambar/*Image Compression* menggunakan metode SVD. SVD adalah *Singular Value Decomposition* sebuah metode dekomposisi matriks menjadi matriks U, Sigma, dan Vt. Dengan mengambil K kolom dari U, K diagonal Sigma, dan K baris dari Vt. Gambar tersebut direkonstruksi kembali melalui perkalinan matriks U * Sigma * Vt. Setelah itu, gambar dapat terkompresi karena semua informasi penting berada pada K awal-awal dari matriks-matriks dekomposisi tersebut.
+
+<br>
+
+## Program Setup <a name = "setup"></a>
 1. Instalasi library dengan pip
 ```sh
 $ python -m pip install numpy
@@ -28,3 +40,9 @@ $ python main.py
 ```
 
 4. Copy alamat website pada terminal dan paste pada browser atau click alamat pada terminal.
+
+<br>
+
+## Program Example <a name = "pe"></a>
+
+![](https://i.ibb.co/kK34nsK/contoh.png)
